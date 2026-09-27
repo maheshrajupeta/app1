@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>EmployeeHub - Java 17</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f9;
+            color: #222;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 240px;
+            background: #172033;
+            color: white;
+            padding: 25px 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 40px;
+        }
+
+        .menu {
+            padding: 14px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .menu.active,
+        .menu:hover {
+            background: #283750;
+        }
+
+        .main {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 30px;
+        }
+
+        .health {
+            background: #e5f8ed;
+            color: #18864b;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns:
+                repeat(4, minmax(180px, 1fr));
+
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow:
+                0 3px 12px rgba(0,0,0,0.07);
+        }
+
+        .card h3 {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .number {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow:
+                0 3px 12px rgba(0,0,0,0.07);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .table-header h2 {
+            font-size: 22px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            color: #666;
+            font-size: 14px;
+        }
+
+        td {
+            font-size: 14px;
+        }
+
+        .status {
+            background: #e6f8ed;
+            color: #16864a;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .delete {
+            border: none;
+            background: #ffe7e7;
+            color: #d63031;
+            padding: 7px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .delete:hover {
+            background: #ffd0d0;
+        }
+
+        .tech {
+            margin-top: 25px;
+            color: #777;
+            font-size: 13px;
+        }
+
+        @media(max-width: 900px) {
+
+            .sidebar {
+                display: none;
+            }
+
+            .cards {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+            .main {
+                padding: 20px;
+            }
+        }
+
+        @media(max-width: 600px) {
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="layout">
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            EmployeeHub
+        </div>
+
+        <div class="menu active">
+            Dashboard
+        </div>
+
+        <div class="menu">
+            Employees
+        </div>
+
+        <div class="menu">
+            Departments
+        </div>
+
+        <div class="menu">
+            Reports
+        </div>
+
+    </aside>
+
+    <main class="main">
+
+        <div class="header">
+
+            <div>
+                <h1>Employee Dashboard</h1>
+                <p>Manage your organization</p>
+            </div>
+
+            <div class="health" id="health">
+                Checking application...
+            </div>
+
+        </div>
+
+        <div class="cards">
+
+            <div class="card">
+                <h3>Total Employees</h3>
+                <div class="number" id="totalEmployees">
+                    0
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>IT Employees</h3>
+                <div class="number" id="itEmployees">
+                    0
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>HR Employees</h3>
+                <div class="number" id="hrEmployees">
+                    0
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Active Employees</h3>
+                <div class="number" id="activeEmployees">
+                    0
+                </div>
+            </div>
+
+        </div>
+
+        <div class="table-container">
+
+            <div class="table-header">
+                <h2>Employees</h2>
+            </div>
+
+            <table>
+
+                <thead>
+
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Department</th>
+                    <th>Position</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+
+                </thead>
+
+                <tbody id="employeeTable">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div class="tech">
+            Built with Java 17 + Spring Boot
+        </div>
+
+    </main>
+
+</div>
+
+<script>
+
+async function loadEmployees() {
+
+    try {
+
+        const response =
+            await fetch("/api/employees");
+
+        const employees =
+            await response.json();
+
+        const table =
+            document.getElementById("employeeTable");
+
+        table.innerHTML = "";
+
+        employees.forEach(employee => {
+
+            const row =
+                document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${employee.id}</td>
+
+                <td>
+                    <strong>${employee.name}</strong>
+                </td>
+
+                <td>${employee.email}</td>
+
+                <td>${employee.department}</td>
+
+                <td>${employee.position}</td>
+
+                <td>
+                    <span class="status">
+                        ${employee.status}
+                    </span>
+                </td>
+
+                <td>
+                    <button
+                        class="delete"
+                        onclick="deleteEmployee(${employee.id})">
+                        Delete
+                    </button>
+                </td>
+            `;
+
+            table.appendChild(row);
+        });
+
+        document.getElementById("totalEmployees")
+            .textContent = employees.length;
+
+        document.getElementById("itEmployees")
+            .textContent =
+            employees.filter(
+                x => x.department === "IT"
+            ).length;
+
+        document.getElementById("hrEmployees")
+            .textContent =
+            employees.filter(
+                x => x.department === "HR"
+            ).length;
+
+        document.getElementById("activeEmployees")
+            .textContent =
+            employees.filter(
+                x => x.status === "Active"
+            ).length;
+
+    }
+    catch (error) {
+
+        console.error(error);
+
+    }
+}
+
+
+async function deleteEmployee(id) {
+
+    if (!confirm("Delete this employee?")) {
+        return;
+    }
+
+    await fetch(
+        `/api/employees/${id}`,
+        {
+            method: "DELETE"
+        }
+    );
+
+    loadEmployees();
+}
+
+
+async function checkHealth() {
+
+    try {
+
+        const response =
+            await fetch("/health");
+
+        if (response.ok) {
+
+            document.getElementById("health")
+                .textContent =
+                "● Application Healthy";
+
+        }
+
+    }
+    catch (error) {
+
+        document.getElementById("health")
+            .textContent =
+            "Application Offline";
+
+    }
+}
+
+
+loadEmployees();
+checkHealth();
+
+</script>
+
+</body>
+
+</html>
